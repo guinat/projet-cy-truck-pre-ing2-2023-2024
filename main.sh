@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#TODO: Errors & Success mng
+#TODO: Time in sec for d1 processing
+#TODO: Fix graph for d1 processing
+#TODO: d2 processing -> C
+
 source scripts/d1_processing.sh
 source scripts/d2_processing.sh
 source scripts/l_processing.sh
@@ -10,7 +15,7 @@ source scripts/utils.sh
 SCRIPT_DIR=$(pwd)
 
 if [ -z "$SCRIPT_DIR" ]; then
-    echo "Error: SCRIPT_DIR is not set."
+    echo -e "${BOLD}${BG_LIGHT_RED}Error! SCRIPT_DIR is not set.${RESET}"
     exit 1
 fi
 
@@ -33,9 +38,6 @@ rm -f "${SCRIPT_DIR}/temp/"*
 
 if [ -f "$CSV_FILE" ]; then
     cp "$CSV_FILE" "$LOCAL_CSV_FILE"
-else
-    echo "Error: Data file '$CSV_FILE' does not exist."
-    exit 1
 fi
 
 shift
@@ -47,8 +49,13 @@ while [ "$#" -gt 0 ]; do
         valid_option=true
         ;;
     -d1)
+
+        d1_start_time=$(date +%s)
         filter_csv_for_d1 "$LOCAL_CSV_FILE"
         generate_graph_for_d1
+        d1_end_time=$(date +%s)
+        d1_duration=$((${d1_end_time} - ${d1_start_time}))
+        echo -e "${ITALIC}Duration of d1 processing: ${RESET}${BOLD}${CYAN}${d1_duration} ${RESET}${ITALIC}seconds"
         valid_option=true
         ;;
     -d2 | -l | -s | -t)
@@ -56,7 +63,7 @@ while [ "$#" -gt 0 ]; do
         valid_option=true
         ;;
     *)
-        echo "Invalid option: $1"
+        echo -e "${BOLD}${BG_LIGHT_RED}Error! Invalid option: $1${RESET}"
         show_help
         exit 1
         ;;
@@ -65,7 +72,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ "$valid_option" = false ]; then
-    echo "Error: At least one valid option is required."
+    echo -e "${BOLD}${BG_LIGHT_RED}Error! At least one valid option is required.${RESET}"
     show_help
     exit 1
 fi

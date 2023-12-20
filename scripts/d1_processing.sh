@@ -1,33 +1,31 @@
 #!/bin/bash
 
-# Function to filter CSV file for top 10 drivers
 filter_csv_for_d1() {
     local input_file="$1"
     local output_file="data/d1_temp_data.csv"
 
     if [[ ! -f "$input_file" ]]; then
-        echo "Error: CSV file not found: $input_file"
+        echo -e "${BOLD}${BG_LIGHT_RED}Error! CSV file not found: $input_file${RESET}"
         return 1
     fi
 
     awk -F';' 'NR > 1 {count[$6] ++$2} END {for (name in count) print count[name] ";" name}' "$input_file" | sort -nr | head -10 >"$output_file"
 
     if [[ -s "$output_file" ]]; then
-        echo "Top 10 drivers list generated: $output_file"
+        echo -e "${LIGHT_GREEN}Success!${RESET} Top 10 drivers list generated: $output_file"
     else
-        echo "Error: Failed to generate top 10 drivers list."
+        echo -e "${BOLD}${BG_LIGHT_RED}Error! Failed to generate top 10 drivers list.${RESET}"
         return 1
     fi
 }
 
-# Function to generate a graph from the filtered CSV
 generate_graph_for_d1() {
     local input_file="data/d1_temp_data.csv"
     local output_dir="images"
     local graph_path="${output_dir}/d1_histogram.png"
 
     if [[ ! -f "$input_file" ]]; then
-        echo "Error: Input file not found: $input_file"
+        echo "${BOLD}${BG_LIGHT_RED}Error! Input file not found: $input_file${RESET}"
         return 1
     fi
 
@@ -55,9 +53,9 @@ generate_graph_for_d1() {
     "
 
     if [[ -f "$graph_path" && -s "$graph_path" ]]; then
-        echo "Histogram generated: $graph_path"
+        echo -e "${LIGHT_GREEN}Success! ${RESET}Histogram generated: $graph_path${RESET}"
     else
-        echo "Error: Failed to generate histogram or file is empty."
+        echo -e "${BOLD}${BG_LIGHT_RED}Error! Failed to generate histogram or file is empty.${RESET}"
         return 1
     fi
 }

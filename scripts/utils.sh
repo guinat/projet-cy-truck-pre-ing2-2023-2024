@@ -17,3 +17,5 @@ show_help() {
     printf "  ${BOLD}${YELLOW}-t${RESET}      Process T\n"
     print_delimiter
 }
+
+#TODO: Errors & Success mng
