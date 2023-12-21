@@ -12,9 +12,9 @@ filter_csv_for_d1() {
     awk -F';' 'NR > 1 {count[$6] ++$2} END {for (name in count) print count[name] ";" name}' "$input_file" | sort -nr | head -10 >"$output_file"
 
     if [[ -s "$output_file" ]]; then
-        echo -e "${LIGHT_GREEN}Success!${RESET} Top 10 drivers list generated: $output_file"
+        alert_success "Top 10 drivers list generated: $output_file"
     else
-        echo -e "${BOLD}${BG_LIGHT_RED}Error! Failed to generate top 10 drivers list.${RESET}"
+        alert_danger "Failed to generate top 10 drivers list."
         return 1
     fi
 }
@@ -25,7 +25,7 @@ generate_graph_for_d1() {
     local graph_path="${output_dir}/d1_histogram.png"
 
     if [[ ! -f "$input_file" ]]; then
-        echo "${BOLD}${BG_LIGHT_RED}Error! Input file not found: $input_file${RESET}"
+        alert_danger "Input file not found: $input_file$"
         return 1
     fi
 
@@ -53,9 +53,9 @@ generate_graph_for_d1() {
     "
 
     if [[ -f "$graph_path" && -s "$graph_path" ]]; then
-        echo -e "${LIGHT_GREEN}Success! ${RESET}Histogram generated: $graph_path${RESET}"
+        alert_success "Histogram generated: $graph_path"
     else
-        echo -e "${BOLD}${BG_LIGHT_RED}Error! Failed to generate histogram or file is empty.${RESET}"
+        alert_danger "Failed to generate histogram or file is empty."
         return 1
     fi
 }
