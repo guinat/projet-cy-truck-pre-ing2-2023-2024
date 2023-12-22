@@ -7,6 +7,11 @@ source scripts/s_processing.sh
 source scripts/t_processing.sh
 source scripts/utils.sh
 
+if ! command -v gnuplot >/dev/null; then
+    alert_danger "GnuPlot is not installed. Please install it to generate charts."
+    exit 1
+fi
+
 SCRIPT_DIR=$(pwd)
 
 if [ -z "$SCRIPT_DIR" ]; then

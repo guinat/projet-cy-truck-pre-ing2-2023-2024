@@ -5,11 +5,19 @@ filter_csv_for_d1() {
     local output_file="data/d1_temp_data.csv"
 
     if [[ ! -f "$input_file" ]]; then
-        echo -e "${BOLD}${BG_LIGHT_RED}Error! CSV file not found: $input_file${RESET}"
-        return 1
+        alert_danger "CSV file not found: $input_file"
+        exit 1
     fi
 
-    awk -F';' 'NR > 1 {count[$6] ++$2} END {for (name in count) print count[name] ";" name}' "$input_file" | sort -nr | head -10 >"$output_file"
+    awk -F';' '
+    NR > 1 {
+        count[$6]++
+    }
+    END {
+        for (name in count) {
+            print name ";" count[name]
+        }
+    }' "$input_file" | sort -t';' -k2nr | head -10 >"$output_file"
 
     if [[ -s "$output_file" ]]; then
         alert_success "Top 10 drivers list generated: $output_file"
@@ -25,32 +33,38 @@ generate_graph_for_d1() {
     local graph_path="${output_dir}/d1_histogram.png"
 
     if [[ ! -f "$input_file" ]]; then
-        alert_danger "Input file not found: $input_file$"
+        alert_danger "Input file not found: $input_file"
         return 1
     fi
 
     gnuplot -e "
-        set terminal png size 800,600;
-        set output '$graph_path';
+    reset;
+    set terminal png size 800,800;
+    set output '$graph_path';
 
-        set title 'Top 10 Drivers by Number of Trips';
-        set datafile separator ';';
+    set ylabel 'Option -d1 : Nb routes = f(Driver)';
+    set datafile separator ';';
 
-        set style data histograms;
-        set style histogram rowstacked;
-        set style fill solid 1.0 border -1;
-        set boxwidth 0.45;
+    set style data histograms;
+    set style histogram rowstacked; 
+    set style fill solid 1.0 border -1;
+    set boxwidth 0.6;
 
-        set xlabel 'Drivers';
-        set ylabel 'Count';
+    set xlabel 'DRIVER NAMES' offset 0,-2;
+    set y2label 'NB ROUTES';
 
-        set yrange [0:*];
-        set auto x;
+    set grid ytics;
 
-        set xtics font ',10';
+    set xtics right rotate by 90 offset 0,-1;
 
-        plot '$input_file' using 1:xticlabels(2) with boxes title 'Trips';
-    "
+    unset ytics; 
+
+    set y2tics right rotate by 90;
+    set y2range [0:*];
+
+    plot '$input_file' using 2:xticlabels(1) axes x1y2 notitle with boxes lc rgb 'green';
+
+"
 
     if [[ -f "$graph_path" && -s "$graph_path" ]]; then
         alert_success "Histogram generated: $graph_path"
