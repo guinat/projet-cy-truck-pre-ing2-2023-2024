@@ -66,7 +66,25 @@ while [ "$#" -gt 0 ]; do
         alert_info "Duration of d1 processing: ${d1_duration} seconds"
         valid_option=true
         ;;
-    -d2 | -l | -s | -t)
+    -d2)
+        d2_start_time=$(date +%s)
+        filter_csv_for_d2 "${SCRIPT_DIR}/data/${CSV_FILENAME}"
+        generate_graph_for_d2
+        d2_end_time=$(date +%s)
+        d2_duration=$((${d2_end_time} - ${d2_start_time}))
+        alert_info "Duration of d2 processing: ${d2_duration} seconds"
+        valid_option=true
+        ;;
+    -l)
+        l_start_time=$(date +%s)
+        filter_csv_for_l "${SCRIPT_DIR}/data/${CSV_FILENAME}"
+        generate_graph_for_l
+        l_end_time=$(date +%s)
+        l_duration=$((${l_end_time} - ${l_start_time}))
+        alert_info "Duration of l processing: ${l_duration} seconds"
+        valid_option=true
+        ;;
+    -s | -t)
         echo -e "\n${YELLOW}TODO: $1\n"
         valid_option=true
         ;;

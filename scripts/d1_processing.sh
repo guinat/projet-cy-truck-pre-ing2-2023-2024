@@ -3,7 +3,6 @@
 filter_csv_for_d1() {
     local input_file="$1"
     local output_file="temp/d1_temp_data.csv"
-    local graph_file="images/d1_histogram.png"
 
     if [[ ! -f "$input_file" ]]; then
         alert_danger "CSV file not found: $input_file"
@@ -50,6 +49,8 @@ generate_graph_for_d1() {
         set output '$graph_path';
         set datafile separator ';';
 
+        set tmargin 3;
+
         set style data histograms;
         set style histogram rowstacked; 
         set style fill solid 1.0;
@@ -59,9 +60,9 @@ generate_graph_for_d1() {
         set y2label 'NB ROUTES';
         set xlabel 'DRIVER NAMES' rotate by -180 offset 0,-2;
 
-        set xtics right rotate by 90 offset 0,-1;
+        set xtics right rotate by 90 offset 0,-1 font ',10';
         unset ytics; 
-        set y2tics center rotate by 90;
+        set y2tics center rotate by 90 font ',10';
 
         set y2range [0:*];
 
