@@ -1,10 +1,13 @@
 #!/bin/bash
+source scripts/c_program.sh
 
 source scripts/d1_processing.sh
 source scripts/d2_processing.sh
 source scripts/l_processing.sh
 source scripts/s_processing.sh
 source scripts/t_processing.sh
+source scripts/t_processing.sh
+
 source scripts/utils.sh
 
 if ! command -v gnuplot >/dev/null; then
@@ -26,6 +29,7 @@ fi
 
 if [ "$#" -lt 1 ]; then
     alert_danger "No input file provided. Please specify a CSV file."
+    show_help
     exit 1
 fi
 
@@ -84,7 +88,16 @@ while [ "$#" -gt 0 ]; do
         alert_info "Duration of l processing: ${l_duration} seconds"
         valid_option=true
         ;;
-    -s | -t)
+    -t)
+        t_start_time=$(date +%s)
+        t_processing "${SCRIPT_DIR}/data/${CSV_FILENAME}"
+        generate_graph_for_t
+        t_end_time=$(date +%s)
+        t_duration=$((${t_end_time} - ${t_start_time}))
+        alert_info "Duration of t processing: ${t_duration} seconds"
+        valid_option=true
+        ;;
+    -s)
         echo -e "\n${YELLOW}TODO: $1\n"
         valid_option=true
         ;;
