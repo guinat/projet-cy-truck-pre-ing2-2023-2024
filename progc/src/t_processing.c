@@ -1,8 +1,8 @@
-#include "../include/t_processing.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "../include/t_processing.h"
 
 node_t *node_create(const char *city_name, int count_trips_through, int count_trips_start)
 {
@@ -219,22 +219,14 @@ void write_top_cities_to_file(node_t *root, const char *output_path, int city_co
     fclose(file);
 }
 
-void free_node(node_t *node)
-{
-    if (node != NULL)
-    {
-        free(node->city_name);
-        free(node);
-    }
-}
-
 void free_avl_tree(node_t *node)
 {
     if (node != NULL)
     {
         free_avl_tree(node->left);
         free_avl_tree(node->right);
-        free_node(node);
+        free(node->city_name);
+        free(node);
     }
 }
 

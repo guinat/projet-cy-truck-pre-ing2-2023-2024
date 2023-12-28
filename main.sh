@@ -4,14 +4,13 @@ source scripts/c_program.sh
 source scripts/d1_processing.sh
 source scripts/d2_processing.sh
 source scripts/l_processing.sh
+source scripts/t_processing.sh
 source scripts/s_processing.sh
-source scripts/t_processing.sh
-source scripts/t_processing.sh
 
 source scripts/utils.sh
 
 if ! command -v gnuplot >/dev/null; then
-    alert_danger "GnuPlot is not installed. Please install it to generate charts."
+    alert_danger "GnuPlot is not installed. Please install it to generate graphs."
     exit 1
 fi
 
@@ -41,7 +40,7 @@ if [ ! -f "$CSV_FILE" ]; then
     exit 1
 fi
 
-for DIR in temp images data demo; do
+for DIR in temp images data; do
     DIR_PATH="${SCRIPT_DIR}/${DIR}"
     if [ ! -d "$DIR_PATH" ]; then
         mkdir -p --mode=a+rw "$DIR_PATH"
@@ -62,44 +61,50 @@ while [ "$#" -gt 0 ]; do
         valid_option=true
         ;;
     -d1)
-        d1_start_time=$(date +%s)
+        d1_start_time=$(date +%s%N)
         filter_csv_for_d1 "${SCRIPT_DIR}/data/${CSV_FILENAME}"
         generate_graph_for_d1
-        d1_end_time=$(date +%s)
-        d1_duration=$((${d1_end_time} - ${d1_start_time}))
+        d1_end_time=$(date +%s%N)
+        d1_duration=$(echo "scale=3; ($d1_end_time - $d1_start_time) / 1000000000" | bc)
         alert_info "Duration of d1 processing: ${d1_duration} seconds"
         valid_option=true
         ;;
     -d2)
-        d2_start_time=$(date +%s)
+        d2_start_time=$(date +%s%N)
         filter_csv_for_d2 "${SCRIPT_DIR}/data/${CSV_FILENAME}"
         generate_graph_for_d2
-        d2_end_time=$(date +%s)
-        d2_duration=$((${d2_end_time} - ${d2_start_time}))
+        d2_end_time=$(date +%s%N)
+        d2_duration=$(echo "scale=3; ($d2_end_time - $d2_start_time) / 1000000000" | bc)
         alert_info "Duration of d2 processing: ${d2_duration} seconds"
         valid_option=true
         ;;
     -l)
-        l_start_time=$(date +%s)
+        l_start_time=$(date +%s%N)
         filter_csv_for_l "${SCRIPT_DIR}/data/${CSV_FILENAME}"
         generate_graph_for_l
-        l_end_time=$(date +%s)
-        l_duration=$((${l_end_time} - ${l_start_time}))
+        l_end_time=$(date +%s%N)
+        l_duration=$(echo "scale=3; ($l_end_time - $l_start_time) / 1000000000" | bc)
         alert_info "Duration of l processing: ${l_duration} seconds"
         valid_option=true
         ;;
     -t)
-        t_start_time=$(date +%s)
+        t_start_time=$(date +%s%N)
         t_processing "${SCRIPT_DIR}/data/${CSV_FILENAME}"
         generate_graph_for_t
-        t_end_time=$(date +%s)
-        t_duration=$((${t_end_time} - ${t_start_time}))
+        t_end_time=$(date +%s%N)
+        t_duration=$(echo "scale=3; ($t_end_time - $t_start_time) / 1000000000" | bc)
         alert_info "Duration of t processing: ${t_duration} seconds"
         valid_option=true
         ;;
     -s)
-        echo -e "\n${YELLOW}TODO: $1\n"
+        s_start_time=$(date +%s%N)
+        s_processing "${SCRIPT_DIR}/data/${CSV_FILENAME}"
+        generate_graph_for_s
+        s_end_time=$(date +%s%N)
+        s_duration=$(echo "scale=3; ($s_end_time - $s_start_time) / 1000000000" | bc)
+        alert_info "Duration of t processing: ${s_duration} seconds"
         valid_option=true
+
         ;;
     *)
         alert_danger "Invalid option: $1"

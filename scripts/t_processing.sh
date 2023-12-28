@@ -40,7 +40,7 @@ t_processing() {
 
 generate_graph_for_t() {
     local input_file="temp/t_temp_data.csv"
-    local graph_path="images/t_histogram.png"
+    local graph_path="images/t_graph.png"
 
     if [[ ! -f "$input_file" ]]; then
         alert_danger "Input file not found: $input_file"
@@ -49,7 +49,7 @@ generate_graph_for_t() {
 
     gnuplot -e "
         reset;
-        set terminal png size 800,800;
+        set terminal png size 1000,1000;
         set output '$graph_path';
         set datafile separator ';';
         set title 'Option -t : Nb routes = f(Towns)';
@@ -58,14 +58,14 @@ generate_graph_for_t() {
 
         set style data histograms;
         set style histogram clustered gap 1;
-        set style fill solid border -1;
-        set boxwidth 0.4 absolute;
+        set boxwidth 0.5;
+        set style fill solid;
 
         set ylabel 'NB ROUTES';
         set xlabel 'TOWN NAMES';
 
-        set xtics rotate by -45 font ',10';
-        set ytics font ',10';
+        set xtics rotate by -45 font ',13';
+        set ytics font ',13';
 
         set yrange [0:*] noreverse;
 
@@ -74,13 +74,14 @@ generate_graph_for_t() {
         set offset 0.2,0.2;
 
         plot '${input_file}' using 2:xtic(1) title 'Total routes' with boxes lt rgb '#79e7ae', \
-        '' using 3:xtic(1) title 'First town' with boxes lt rgb '#e77879';
-"
+        '' using 3 title 'First town' with boxes lt rgb '#5dca93';
+    "
 
     if [[ -f "$graph_path" && -s "$graph_path" ]]; then
-        alert_success "Histogram generated: $graph_path"
+        alert_success "The graph for treatment T has been generated successfully: $graph_path"
+        command display images/t_graph.png &
     else
-        alert_danger "Failed to generate histogram or file is empty."
+        alert_danger "Failed to generate graph for treatment T or file is empty."
         exit 1
     fi
 }

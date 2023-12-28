@@ -34,7 +34,7 @@ filter_csv_for_d2() {
 
 generate_graph_for_d2() {
     local input_file="temp/d2_temp_data.csv"
-    local graph_path="images/d2_histogram.png"
+    local graph_path="temp/d2_temp_graph.png"
 
     if [[ ! -f "$input_file" ]]; then
         alert_danger "Input file not found: $input_file"
@@ -43,7 +43,7 @@ generate_graph_for_d2() {
 
     gnuplot -e "
         reset;
-        set terminal png size 800,800;
+        set terminal png size 1000,1000;
         set output '$graph_path';
         set datafile separator ';';
 
@@ -58,9 +58,9 @@ generate_graph_for_d2() {
         set y2label 'DISTANCE (Km)';
         set xlabel 'DRIVER NAMES' rotate by -180 offset 0,-2;
 
-        set xtics right rotate by 90 offset 0,-1 font ',10';
+        set xtics right rotate by 90 offset 0,-1 font ',13';
         unset ytics; 
-        set y2tics center rotate by 90 font ',10';
+        set y2tics center rotate by 90 font ',13';
 
         set y2range [0:*];
 
@@ -69,9 +69,11 @@ generate_graph_for_d2() {
     "
 
     if [[ -f "$graph_path" && -s "$graph_path" ]]; then
-        alert_success "Histogram generated: $graph_path"
+        alert_success "The graph for treatment D2 has been generated successfully: $graph_path"
+        command convert $graph_path -rotate 90 images/d2_graph.png >/dev/null
+        command display images/d2_graph.png &
     else
-        alert_danger "Failed to generate histogram or file is empty."
+        alert_danger "Failed to generate graph for treatment D2 or file is empty."
         exit 1
     fi
 }

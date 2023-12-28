@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../include/t_processing.h"
+#include "../include/s_processing.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,6 +16,10 @@ int main(int argc, char *argv[])
     if (strcmp(argv[1], "-t") == 0)
     {
         t_processing(argv[2], argv[3]);
+    }
+    else if (strcmp(argv[1], "-s") == 0)
+    {
+        s_processing(argv[2], argv[3]);
     }
     else
     {

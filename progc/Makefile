@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -Isrc/include
+LDFLAGS = -lm
 SRC_DIR = src
 OBJ_DIR = build
 BIN_DIR = bin

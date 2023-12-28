@@ -22,13 +22,13 @@ node_t *left_rotate(node_t *x);
 node_t *node_insert(node_t *node, const char *city_name, int count_trips_through, int count_trips_start);
 
 void process_csv_file(const char *file_path, node_t **root);
+
 int count_nodes(node_t *root);
 int compare_nodes(const void *a, const void *b);
 int compare_nodes_for_alpha(const void *a, const void *b);
 void store_nodes_in_array(node_t *node, node_t *node_array[], int *index);
 void write_top_cities_to_file(node_t *root, const char *output_path, int city_count);
 
-void free_node(node_t *node);
 void free_avl_tree(node_t *node);
 
 void t_processing(const char *input_path, const char *output_path);

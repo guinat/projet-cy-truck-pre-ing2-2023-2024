@@ -35,7 +35,7 @@ filter_csv_for_l() {
 
 generate_graph_for_l() {
     local input_file="temp/l_temp_data.csv"
-    local graph_path="images/l_histogram.png"
+    local graph_path="images/l_graph.png"
 
     if [[ ! -f "$input_file" ]]; then
         alert_danger "Input file not found: $input_file"
@@ -44,7 +44,7 @@ generate_graph_for_l() {
 
     gnuplot -e "
         reset;
-        set terminal png size 800,800;
+        set terminal png size 1000,1000;
         set output '$graph_path';
         set datafile separator ';';
         set title 'Option -l : Distance = f(Route)';
@@ -57,8 +57,8 @@ generate_graph_for_l() {
         set ylabel 'DISTANCE (Km)';
         set xlabel 'ROUTE ID';
 
-        set xtics  font ',10';
-        set ytics  font ',10';
+        set xtics  font ',13';
+        set ytics  font ',13';
 
         set yrange [0:*];
 
@@ -67,9 +67,10 @@ generate_graph_for_l() {
     "
 
     if [[ -f "$graph_path" && -s "$graph_path" ]]; then
-        alert_success "Histogram generated: $graph_path"
+        alert_success "The graph for treatment L has been generated successfully: $graph_path"
+        command display images/l_graph.png &
     else
-        alert_danger "Failed to generate histogram or file is empty."
+        alert_danger "Failed to generate graph for treatment L or file is empty."
         exit 1
     fi
 }
