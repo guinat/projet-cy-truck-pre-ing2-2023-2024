@@ -1,26 +1,31 @@
 #!/bin/bash
 
+# Include the C program functions from c_program.sh
 source scripts/c_program.sh
 
+# Function for processing treatment S
 s_processing() {
-
     local _DIR=$(pwd)
     local exec="_exec"
     local exec_path="progc/bin/$exec"
     local input_file="$1"
     local output_file="$_DIR/temp/s_temp_data.csv"
 
+    # Check if 'make' is installed
     command -v make >/dev/null 2>&1 || {
         alert_danger "Make is required but not installed. Aborting."
         exit 1
     }
 
+    # Compile the C program if the executable doesn't exist
     if [ ! -f "$exec_path" ]; then
         compile_c_program
     fi
 
+    # Check if the 'progc/bin' directory exists
     if [ -d "progc/bin" ]; then
         if (cd progc/bin && "./$exec" -s "$input_file" "$output_file" 2>&1); then
+            # Check if the output file is not empty
             if [[ -s "$output_file" ]]; then
                 alert_success "Top 50 routes list generated: $output_file"
             else
@@ -38,15 +43,18 @@ s_processing() {
     fi
 }
 
+# Function to generate a graph for treatment S
 generate_graph_for_s() {
     local input_file="temp/s_temp_data.csv"
     local graph_path="images/s_graph.png"
 
+    # Check if the input data file exists
     if [[ ! -f "$input_file" ]]; then
         alert_danger "Input file not found: $input_file"
         exit 1
     fi
 
+    # Use Gnuplot to create a graph from the data
     gnuplot -e "
     reset;
     set terminal png size 1600,1000;
@@ -65,6 +73,7 @@ generate_graph_for_s() {
          '' using 4:xticlabels(2) with line lw 2 title 'Distance Average (Km)'
 "
 
+    # Check if the graph file was successfully generated and not empty
     if [[ -f "$graph_path" && -s "$graph_path" ]]; then
         alert_success "The graph for treatment S has been generated successfully: $graph_path"
         command display images/s_graph.png &
