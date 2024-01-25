@@ -75,6 +75,20 @@ cp "$CSV_FILE" "${SCRIPT_DIR}/data/${CSV_FILENAME}"
 # Process command line options
 shift
 
+verify_csv_format
+cd progc/verify
+./_exec "${SCRIPT_DIR}/data/${CSV_FILENAME}"
+
+# Check if verify file format terminated successfully
+if [ $? -eq 0 ]; then
+    alert_success "File format is correct."
+else
+    alert_danger "An error has occurred, check the log file"
+    exit 1
+fi
+
+cd ../..
+
 valid_option=false
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -139,7 +153,7 @@ while [ "$#" -gt 0 ]; do
         s_end_time=$(date +%s%N)
         # Calculate the duration of s processing in seconds
         s_duration=$(echo "scale=3; ($s_end_time - $s_start_time) / 1000000000" | bc)
-        alert_info "Duration of t processing: ${s_duration} seconds"
+        alert_info "Duration of s processing: ${s_duration} seconds"
         valid_option=true
         ;;
     *)

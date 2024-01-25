@@ -69,14 +69,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: %s <option> <input_path> <output_path>\n", argv[0]);
         return 1;
     }
-
-    // Verify CSV format
-    if (verify_csv_format(argv[2]) != 0)
-    {
-        fprintf(stderr, "Error: CSV file format is incorrect.\n");
-        return 1;
-    }
-
+    
     if (strcmp(argv[1], "-t") == 0)
     {
         // Call the t_processing function with input and output paths.

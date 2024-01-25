@@ -3,6 +3,19 @@
 # Include the custom colors file for display
 source scripts/colors.sh
 
+verify_csv_format() {
+    # Compile the verify.c program
+    local path_exec="progc/verify/_exec"
+    gcc -o $path_exec progc/verify/verify.c 2>&1
+
+    # Check if the compilation was successful
+    if [ $? -eq 0 ]; then
+        alert_info "File currently being checked..."
+    else
+        alert_danger "Compilation failed."
+    fi
+}
+
 # Define the function to compile the C program
 compile_c_program() {
     local prog_dir="progc" # Directory of the C program to compile
