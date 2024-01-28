@@ -5,44 +5,56 @@
 #include "../include/t_processing.h"
 
 /**
- * @brief Function to create a new AVL tree node.
+ * @brief Function to insert a new city in the AVL tree
  *
- * @param city_name
- * @param count_trips_through
- * @param count_trips_start
- * @return node_t*
+ * @param node
+ * @param city
+ * @return node_t_t*
  */
-node_t *node_create(const char *city_name, int count_trips_through, int count_trips_start)
+node_t_t *node_insert_t(node_t_t *node, city_t city)
 {
-    node_t *node = (node_t *)malloc(sizeof(node_t));
-    if (!node)
+    if (node == NULL)
+        return (node_create_t(city));
+
+    if (city.total_count < node->data.total_count)
+        node->left = node_insert_t(node->left, city);
+    else if (city.total_count > node->data.total_count)
+        node->right = node_insert_t(node->right, city);
+    else
+        return node;
+
+    node->height = 1 + max_t(height_t(node->left), height_t(node->right));
+
+    int balance = get_balance_t(node);
+
+    if (balance > 1 && city.total_count < node->left->data.total_count)
+        return right_rotate_t(node);
+
+    if (balance < -1 && city.total_count > node->right->data.total_count)
+        return left_rotate_t(node);
+
+    if (balance > 1 && city.total_count > node->left->data.total_count)
     {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
+        node->left = left_rotate_t(node->left);
+        return right_rotate_t(node);
     }
 
-    node->city_name = strdup(city_name);
-    if (!(node->city_name))
+    if (balance < -1 && city.total_count < node->right->data.total_count)
     {
-        fprintf(stderr, "Memory allocation failed\n");
-        exit(EXIT_FAILURE);
+        node->right = right_rotate_t(node->right);
+        return left_rotate_t(node);
     }
-    node->count_trips_through = count_trips_through;
-    node->count_trips_start = count_trips_start;
-    node->left = NULL;
-    node->right = NULL;
-    node->height = 1;
 
     return node;
 }
 
 /**
- * @brief Function to get the height of a node.
+ * @brief Function to get the height of the tree
  *
  * @param node
  * @return int
  */
-int height(node_t *node)
+int height_t(node_t_t *node)
 {
     if (node == NULL)
         return 0;
@@ -50,277 +62,159 @@ int height(node_t *node)
 }
 
 /**
- * @brief Function to return the maximum of two integers.
+ * @brief Function to get the max between two integers
  *
  * @param a
  * @param b
  * @return int
  */
-int max(int a, int b)
+int max_t(int a, int b)
 {
     return (a > b) ? a : b;
 }
 
 /**
- * @brief Function to perform a right rotation on a node.
+ * @brief Function to create a new node
  *
- * @param y
- * @return node_t*
+ * @param city
+ * @return node_t_t*
  */
-node_t *right_rotate(node_t *y)
+node_t_t *node_create_t(city_t city)
 {
-    node_t *x = y->left;
-    node_t *T2 = x->right;
-
-    x->right = y;
-    y->left = T2;
-
-    y->height = max(height(y->left), height(y->right)) + 1;
-    x->height = max(height(x->left), height(x->right)) + 1;
-
-    return x;
-}
-
-/**
- * @brief Function to perform a left rotation on a node.
- *
- * @param x
- * @return node_t*
- */
-node_t *left_rotate(node_t *x)
-{
-    node_t *y = x->right;
-    node_t *T2 = y->left;
-
-    y->left = x;
-    x->right = T2;
-
-    x->height = max(height(x->left), height(x->right)) + 1;
-    y->height = max(height(y->left), height(y->right)) + 1;
-
-    return y;
-}
-
-/**
- * @brief Function to get the balance factor of a node.
- *
- * @param node
- * @return int
- */
-int get_balance(node_t *node)
-{
-    if (node == NULL)
-        return 0;
-    return height(node->left) - height(node->right);
-}
-
-/**
- * @brief Function to insert a node into an AVL tree.
- *
- * @param node
- * @param city_name
- * @param count_trips_through
- * @param count_trips_start
- * @return node_t*
- */
-node_t *node_insert(node_t *node, const char *city_name, int count_trips_through, int count_trips_start)
-{
-    if (node == NULL)
-        return node_create(city_name, count_trips_through, count_trips_start);
-
-    int cmp = strcmp(city_name, node->city_name);
-    if (cmp < 0)
+    node_t_t *node = (node_t_t *)malloc(sizeof(node_t_t));
+    if (!node)
     {
-        node->left = node_insert(node->left, city_name, count_trips_through, count_trips_start);
+        perror("Error allocating memory");
+        exit(EXIT_FAILURE);
     }
-    else if (cmp > 0)
-    {
-        node->right = node_insert(node->right, city_name, count_trips_through, count_trips_start);
-    }
-    else
-    {
-        node->count_trips_through += count_trips_through;
-        node->count_trips_start += count_trips_start;
-        return node;
-    }
+    node->data = city;
 
-    node->height = 1 + max(height(node->left), height(node->right));
+    node->left = NULL;
+    node->right = NULL;
 
-    int balance = get_balance(node);
-
-    if (balance > 1 && strcmp(city_name, node->left->city_name) < 0)
-        return right_rotate(node);
-
-    if (balance < -1 && strcmp(city_name, node->right->city_name) > 0)
-        return left_rotate(node);
-
-    if (balance > 1 && strcmp(city_name, node->left->city_name) > 0)
-    {
-        node->left = left_rotate(node->left);
-        return right_rotate(node);
-    }
-
-    if (balance < -1 && strcmp(city_name, node->right->city_name) < 0)
-    {
-        node->right = right_rotate(node->right);
-        return left_rotate(node);
-    }
+    node->height = 1;
 
     return node;
 }
 
 /**
- * @brief Function to process a CSV file and build an AVL tree.
+ * @brief Function to right rotate a node
  *
- * @param file_path
- * @param root
+ * @param y
+ * @return node_t_t*
  */
-void process_csv_file(const char *file_path, node_t **root)
+node_t_t *right_rotate_t(node_t_t *y)
 {
-    FILE *file = fopen(file_path, "r");
-    if (!file)
-    {
-        fprintf(stderr, "Unable to open file: %s\n", file_path);
-        return;
-    }
+    node_t_t *x = y->left;
+    node_t_t *T2 = x->right;
 
-    char line[MAX_LINE_LENGTH];
-    const char *delimiter = ";";
+    x->right = y;
+    y->left = T2;
 
-    fgets(line, MAX_LINE_LENGTH, file);
+    y->height = max_t(height_t(y->left), height_t(y->right)) + 1;
+    x->height = max_t(height_t(x->left), height_t(x->right)) + 1;
 
-    while (fgets(line, MAX_LINE_LENGTH, file))
-    {
-        char *route_id = strtok(line, delimiter);
-        char *step_id_str = strtok(NULL, delimiter);
-        char *start_city = strtok(NULL, delimiter);
-        char *end_city = strtok(NULL, delimiter);
-
-        if (end_city)
-        {
-            *root = node_insert(*root, strdup(end_city), 1, 0);
-        }
-
-        int step_id = atoi(step_id_str);
-        if (start_city && step_id == 1)
-        {
-            *root = node_insert(*root, strdup(start_city), 1, 1);
-        }
-    }
-
-    fclose(file);
+    return x;
 }
 
 /**
- * @brief Function to count nodes in the AVL tree.
+ * @brief Function to left rotate a node
+ *
+ * @param x
+ * @return node_t_t*
+ */
+node_t_t *left_rotate_t(node_t_t *x)
+{
+    node_t_t *y = x->right;
+    node_t_t *T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    x->height = max_t(height_t(x->left), height_t(x->right)) + 1;
+    y->height = max_t(height_t(y->left), height_t(y->right)) + 1;
+
+    return y;
+}
+
+/**
+ * @brief Get the Balance object
  *
  * @param node
  * @return int
  */
-int count_nodes(node_t *node)
+int get_balance_t(node_t_t *node)
 {
     if (node == NULL)
         return 0;
-    return 1 + count_nodes(node->left) + count_nodes(node->right);
+    return height_t(node->left) - height_t(node->right);
 }
 
 /**
- * @brief Comparison function for qsort based on total trips.
+ * @brief Function to print the tree in order
  *
- * @param a
- * @param b
- * @return int
+ * @param root
+ * @param top_cities
+ * @param count
  */
-int compare_nodes(const void *a, const void *b)
+void top_10_cities_t(node_t_t *root, city_t top_cities[], int *count)
 {
-    const node_t *nodeA = *(const node_t **)a;
-    const node_t *nodeB = *(const node_t **)b;
-    int totalA = nodeA->count_trips_through;
-    int totalB = nodeB->count_trips_through;
-
-    return totalB - totalA;
-}
-
-/**
- * @brief Comparison function for qsort based on city names.
- *
- * @param a
- * @param b
- * @return int
- */
-int compare_nodes_for_alpha(const void *a, const void *b)
-{
-    const node_t *nodeA = *(const node_t **)a;
-    const node_t *nodeB = *(const node_t **)b;
-    return strcmp(nodeA->city_name, nodeB->city_name);
-}
-
-/**
- * @brief Function to store AVL tree nodes in an array.
- *
- * @param node
- * @param node_array
- * @param index
- */
-void store_nodes_in_array(node_t *node, node_t *node_array[], int *index)
-{
-    if (node != NULL)
+    if (root != NULL && *count < 10)
     {
-        store_nodes_in_array(node->left, node_array, index);
-        node_array[*index] = node;
-        (*index)++;
-        store_nodes_in_array(node->right, node_array, index);
+        top_10_cities_t(root->right, top_cities, count);
+        if (*count < 10)
+        {
+            top_cities[*count] = root->data;
+            (*count)++;
+        }
+        top_10_cities_t(root->left, top_cities, count);
     }
 }
 
 /**
- * @brief Function to write the top cities to an output file.
+ * @brief Function to sort the cities alphabetically
  *
- * @param root
- * @param output_path
- * @param city_count
+ * @param cities
+ * @param n
  */
-void write_top_cities_to_file(node_t *root, const char *output_path, int city_count)
+void sort_cities_alphabetically_t(city_t cities[], int n)
 {
-    node_t *node_array[city_count];
-    int index = 0;
+    for (int i = 0; i < n - 1; i++)
+    {
+        for (int j = 0; j < n - i - 1; j++)
+        {
+            if (strcmp(cities[j].name, cities[j + 1].name) > 0)
+            {
+                city_t temp = cities[j];
+                cities[j] = cities[j + 1];
+                cities[j + 1] = temp;
+            }
+        }
+    }
+}
 
-    store_nodes_in_array(root, node_array, &index);
-
-    qsort(node_array, city_count, sizeof(node_t *), compare_nodes);
-
-    FILE *file = fopen(output_path, "w");
+/**
+ * @brief Function to write the top cities in a file
+ *
+ * @param filename
+ * @param cities
+ * @param n
+ */
+void write_top_cities_t(const char *filename, city_t cities[], int n)
+{
+    FILE *file = fopen(filename, "w");
     if (!file)
     {
-        fprintf(stderr, "Unable to open file for writing: %s\n", output_path);
+        perror("Error opening file");
         return;
     }
 
-    qsort(node_array, (city_count > 10 ? 10 : city_count), sizeof(node_t *), compare_nodes_for_alpha);
-
-    for (int i = 0; i < 10 && i < city_count; i++)
+    for (int i = 0; i < n; i++)
     {
-        node_t *node = node_array[i];
-        fprintf(file, "%s;%d;%d\n", node->city_name, node->count_trips_through, node->count_trips_start);
+        fprintf(file, "%s;%d;%d\n", cities[i].name, cities[i].total_count, cities[i].start_count);
     }
 
     fclose(file);
-}
-
-/**
- * @brief Function to free memory allocated for the AVL tree.
- *
- * @param node
- */
-void free_avl_tree(node_t *node)
-{
-    if (node != NULL)
-    {
-        free_avl_tree(node->left);
-        free_avl_tree(node->right);
-        free(node->city_name);
-        free(node);
-    }
 }
 
 /**
@@ -331,13 +225,29 @@ void free_avl_tree(node_t *node)
  */
 void t_processing(const char *input_path, const char *output_path)
 {
-    node_t *root = NULL;
+    node_t_t *root = NULL;
+    city_t top_cities[10];
+    int top_count = 0;
 
-    process_csv_file(input_path, &root);
+    FILE *file = fopen(input_path, "r");
+    if (!file)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
 
-    int city_count = count_nodes(root);
+    char line[LINE_LENGTH];
+    while (fgets(line, sizeof(line), file))
+    {
+        city_t new_city;
+        sscanf(line, "%[^;];%d;%d", new_city.name, &new_city.total_count, &new_city.start_count);
+        root = node_insert_t(root, new_city);
+    }
+    fclose(file);
 
-    write_top_cities_to_file(root, output_path, city_count);
+    top_10_cities_t(root, top_cities, &top_count);
 
-    free_avl_tree(root);
+    sort_cities_alphabetically_t(top_cities, top_count);
+
+    write_top_cities_t(output_path, top_cities, top_count);
 }

@@ -135,7 +135,8 @@ while [ "$#" -gt 0 ]; do
     -t)
         # Measure the start time for t processing
         t_start_time=$(date +%s%N)
-        t_processing "${SCRIPT_DIR}/data/${CSV_FILENAME}"
+        # cut -d ';' -f 1-4 "${SCRIPT_DIR}/data/${CSV_FILENAME}" >"${SCRIPT_DIR}/data/filtered.csv"
+        t_processing
         generate_graph_for_t
         # Measure the end time for t processing
         t_end_time=$(date +%s%N)

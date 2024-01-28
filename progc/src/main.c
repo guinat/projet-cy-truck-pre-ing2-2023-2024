@@ -6,7 +6,7 @@
 #include "../include/t_processing.h"
 #include "../include/s_processing.h"
 
-#define MAX_LINE_LENGTH 1024
+#define MAX_LINE_LENGTH_ 1024
 
 /**
  * @brief Function to verify the CSV file format.
@@ -23,10 +23,10 @@ int verify_csv_format(const char *filename)
         return 1; // File opening failed
     }
 
-    char line[MAX_LINE_LENGTH];
+    char line[MAX_LINE_LENGTH_];
     int line_count = 0;
 
-    while (fgets(line, MAX_LINE_LENGTH, file))
+    while (fgets(line, MAX_LINE_LENGTH_, file))
     {
         line_count++;
         line[strcspn(line, "\n")] = 0;
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Usage: %s <option> <input_path> <output_path>\n", argv[0]);
         return 1;
     }
-    
+
     if (strcmp(argv[1], "-t") == 0)
     {
         // Call the t_processing function with input and output paths.

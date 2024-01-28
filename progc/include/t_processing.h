@@ -1,43 +1,33 @@
-#if !defined(__T__PROCESSING__H__)
-#define __T__PROCESSING__H__
+#define MAX_CITIES 10000
+#define LINE_LENGTH 100
 
-// Define a constant for the maximum line length.
-#define MAX_LINE_LENGTH 1024
-
-// Define a struct for a binary tree node.
-typedef struct Node
+typedef struct City
 {
-    char *city_name;
-    int count_trips_through;
-    int count_trips_start;
-    struct Node *left;
-    struct Node *right;
+    char name[50];
+    int total_count;
+    int start_count;
+} city_t;
+
+typedef struct Node_t
+{
+    city_t data;
+    struct Node_t *left;
+    struct Node_t *right;
     int height;
-} node_t;
+} node_t_t;
 
-// Function prototypes for AVL tree operations.
-node_t *node_create(const char *city_name, int count_trips_through, int count_trips_start);
-int height(node_t *node);
-int max(int a, int b);
-int get_balance(node_t *node);
-node_t *right_rotate(node_t *y);
-node_t *left_rotate(node_t *x);
-node_t *node_insert(node_t *node, const char *city_name, int count_trips_through, int count_trips_start);
+// Function prototypes
 
-// Function prototype for CSV processing.
-void process_csv_file(const char *file_path, node_t **root);
+int height_t(node_t_t *node);
+int max_t(int a, int b);
+int get_balance_t(node_t_t *node);
+node_t_t *node_create_t(city_t city);
+node_t_t *right_rotate_t(node_t_t *y);
+node_t_t *left_rotate_t(node_t_t *x);
+node_t_t *node_insert_t(node_t_t *node, city_t city);
 
-// Function prototypes for data manipulation and output.
-int count_nodes(node_t *root);
-int compare_nodes(const void *a, const void *b);
-int compare_nodes_for_alpha(const void *a, const void *b);
-void store_nodes_in_array(node_t *node, node_t *node_array[], int *index);
-void write_top_cities_to_file(node_t *root, const char *output_path, int city_count);
-
-// Function prototype for freeing memory allocated for the AVL tree.
-void free_avl_tree(node_t *node);
-
-// Main processing function prototype.
+void top_10_cities_t(node_t_t *root, city_t top_cities[], int *count);
+void sort_cities_alphabetically_t(city_t cities[], int n);
+void write_top_cities_t(const char *filename, city_t cities[], int n);
+void inOrderT(node_t_t *root);
 void t_processing(const char *input_path, const char *output_path);
-
-#endif // __T__PROCESSING__H__

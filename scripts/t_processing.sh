@@ -8,14 +8,40 @@ t_processing() {
     local _DIR=$(pwd)
     local exec="_exec"
     local exec_path="progc/bin/$exec"
-    local input_file="$1"
+    local input_file="$_DIR/data/data.csv"
     local output_file="$_DIR/temp/t_temp_data.csv"
+    local file_for_gnuplot="$_DIR/temp/t_gnuplot_data.csv"
 
+    cut -d ';' -f 1-4 "$input_file" >"$_DIR/temp/t_filtered.csv"
     # Check if 'make' is installed
     command -v make >/dev/null 2>&1 || {
         alert_danger "Make is required but not installed. Aborting."
         exit 1
     }
+
+    awk_script='
+    BEGIN { FS=";" }
+    NR > 1 {
+        if ($2 == 1) {
+            totalStart[$3]++
+        }
+        if (!visited[$1,$3]++) {
+            totalCount[$3]++
+        }
+        if (!visited[$1,$4]++) {
+            totalCount[$4]++
+        }
+    }
+    END {
+        for (ville in totalCount) {
+            if (!(ville in totalStart)) {
+                totalStart[ville] = 0
+            }
+            print ville ";" totalCount[ville] ";" totalStart[ville]
+        }
+    }'
+
+    awk "$awk_script" "$_DIR/temp/t_filtered.csv" >"$output_file"
 
     # Compile the C program if the executable doesn't exist
     if [ ! -f "$exec_path" ]; then
@@ -24,7 +50,7 @@ t_processing() {
 
     # Check if the 'progc/bin' directory exists
     if [ -d "progc/bin" ]; then
-        if (cd progc/bin && "./$exec" -t "$input_file" "$output_file" 2>&1); then
+        if (cd progc/bin && "./$exec" -t "$output_file" "$file_for_gnuplot" 2>&1); then
             # Check if the output file is not empty
             if [[ -s "$output_file" ]]; then
                 alert_success "Top 10 city list generated: $output_file"
@@ -45,7 +71,7 @@ t_processing() {
 
 # Function to generate a graph for treatment T
 generate_graph_for_t() {
-    local input_file="temp/t_temp_data.csv"
+    local input_file="temp/t_gnuplot_data.csv"
     local graph_path="images/t_graph.png"
 
     # Check if the input data file exists
