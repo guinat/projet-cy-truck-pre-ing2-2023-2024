@@ -18,7 +18,7 @@ t_processing() {
         alert_danger "Make is required but not installed. Aborting."
         exit 1
     }
-
+#Script by chatGPT
     awk_script='
     BEGIN { FS=";" }
     NR > 1 {
